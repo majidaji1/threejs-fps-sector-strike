@@ -1,5 +1,7 @@
 // HUD updates: health, ammo, timer, score, money, kill feed, objective text, round result overlay.
+// Crosshair gap widens with recent recoil for readable spread feedback.
 export function createHud() {
+  const recoilPulse = { value: 0 };
   const el = {
     crosshair: document.getElementById('crosshair'),
     hitmarker: document.getElementById('hitmarker'),
@@ -85,6 +87,15 @@ export function createHud() {
     setTimeout(() => line.remove(), 4000);
   }
 
+  // Decay recoil pulse used to widen crosshair gap between shots.
+  function pulseRecoil(amount) {
+    recoilPulse.value = Math.min(1, recoilPulse.value + amount);
+  }
+
+  function decayRecoil(dt) {
+    recoilPulse.value = Math.max(0, recoilPulse.value - dt * 4);
+  }
+
   function showStart() {
     el.startOverlay.hidden = false;
   }
@@ -153,6 +164,8 @@ export function createHud() {
     setObjective,
     hitMarker,
     addKillFeed,
+    pulseRecoil,
+    decayRecoil,
     showStart,
     hideStart,
     onStartPlay,
